@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8"/>
+
+        <link href="/webjars/bootstrap/5.0.1/css/bootstrap.min.css" rel="stylesheet">
+
+        <title>Requests</title>
+    </head>
+
+    <body>
+        <div class="d-flex flex-column m-3">
+            <p style="font-weight: bold;" th:unless="${requests} and ${requests.size()}">No requests have been made!</p>
+          <!-- Display this if no requests exist -->
+
+            <table class="table table-dark" th:if="${requests} and ${requests.size()}">
+              <!-- Check if there any requests in the DB, if there aren't any don't create this
+              HTML element -->
+                <tr>
+                    <th scope="col">Status</th>
+                    <th scope="col">ID</th>
+                    <th scope="col">Item</th>
+                    <th scope="col">Attributes</th>
+                    <th scope="col">Reason</th>
+                    <th scope="col">Created At</th>
+                    <th scope="col"></th>
+                </tr>
+                <tr th:each="request : ${requests}">
+                    <td scope="row" th:switch="${request.status}">
+                        <div class="rounded-circle bg-secondary mx-auto" style="width: 25px; height: 25px;" th:case="-1"></div>
+                        <div class="rounded-circle bg-danger mx-auto" style="width: 25px; height: 25px;" th:case="0"></div>
+                        <div class="rounded-circle bg-success mx-auto" style="width: 25px; height: 25px;" th:case="1"></div>
+                    </td>
+                    <td scope="row" th:text="${request.id}"></td>
+                    <td th:text="${request.request_Item.item.name}"></td> 
+                    <td>
+                        <div th:each="attr : ${request.attributes}">
+                            <span th:text="${attr.key}"></span>: <span th:text="${attr.value}"></span>
+                        </div>
+                    </td>
+                    <td th:text="${request.reason}"></td>
+                    <td th:text="${#temporals.format(request.createdDate,'dd-MM-yyyy HH:mm:ss')}"></td>
+                    <td>
+                        <div class="d-flex justify-content-between">
+                            <div style="margin-right: 30px;" th:if="${request.status == -1}">
+                                <form th:action="@{/requests/status}" method="POST">
+                                    <input type="hidden" name="requestID" th:value="${request.id}">
+                                    <button name="status" class="btn btn-success" type="submit" value="1">Approve</button>
+                                    <button name="status" class="btn btn-danger" style="margin-left: 10px;" type="submit" value="0">Reject</button>
+                                </form>
+                            </div>
+
+                            <div>
+                                <form method="POST" th:action="@{/requests/remove}">
+                                    <input type="hidden" name="requestID" th:value="${request.id}">
+                                    <!-- This input field is hidden, because we don't need to show the user information
+                                    about the requestID, we just want to get the value from this field when the
+                                    button is pressed so we can redirect to that route -->
+                                    <button type="submit" class="btn btn-primary">Remove</button>
+                                </form>
+                            </div> 
+                        </div>
+                    </td>
+            </table>
+            
+            <div class="d-flex justify-content-end">
+                <a th:href=@{/requests/create} class="btn btn-primary">Create request</a>
+            </div>
+        </div>
+    </body>
+</html>

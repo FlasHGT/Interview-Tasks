@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8"/>
+
+        <link href="/webjars/bootstrap/5.0.1/css/bootstrap.min.css" rel="stylesheet">
+
+        <title>Create a Request</title>
+    </head>
+
+    <body>
+        <div class="d-flex flex-column w-25 mx-auto my-3">
+            <form method="POST" id="item-form" th:object="${itemFormValidator}">
+                <div class="form-group">
+                    <label th:for="itemID" style="font-weight: bold;">Items</label>
+                    <select class="form-control" th:field="*{itemID}">
+                        <!-- Default option has the value of 0, after that we generate all the items from the database
+                        with their corresponding IDs -->
+                        <option th:value="0" selected>Select Item</option>
+                        <option th:each="item : ${items}" th:text="${item.name}" th:value="${item.id}"></option>
+                    </select>
+                    <span th:errors="*{itemID}" class="text-danger">Please choose an item!</span>
+                </div>
+            </form>
+            
+            <div class="d-flex justify-content-end">
+                <form th:action="@{/requests}">
+                    <button type="submit" class="btn btn-primary m-3">Back</button>
+                </form>
+                
+                <button type="submit" form="item-form" class="btn btn-primary my-3">Next</button>
+                
+            </div>
+        </div>
+    </body>
+</html>
